@@ -48,7 +48,7 @@ RUN ln -s /edk2-platforms/Silicon /edk2/Silicon && \
 
 # Set up deps.
 RUN python3 -m venv venv
-RUN . venv/bin/activate && pip install -r pip-requirements.txt --upgrade
+RUN . venv/bin/activate && pip install setuptools==70.3.0 && pip install -r pip-requirements.txt --upgrade
 ENV toolchain=GCC
 RUN . venv/bin/activate && python BaseTools/Edk2ToolsBuild.py -t "${toolchain}"
 
@@ -95,10 +95,9 @@ RUN mkdir "${bin_dir}"/x64
 RUN mkdir "${bin_dir}"/loongarch64
 
 # Copy AARCH64 files to bin dir.
-ENV aarch64_build="Build/ArmVirtQemu-AArch64/${build_target}_${toolchain}"
-RUN cp "${aarch64_build}/FV/QEMU_EFI.fd" "${bin_dir}"/aarch64/code.fd
-RUN cp "${aarch64_build}/FV/QEMU_VARS.fd" "${bin_dir}"/aarch64/vars.fd
-RUN cp "${aarch64_build}/AARCH64/Shell.efi" "${bin_dir}"/aarch64/shell.efi
+RUN cp Build/ArmVirtQemu-A*64/${build_target}_${toolchain}/FV/QEMU_EFI.fd "${bin_dir}/aarch64/code.fd"
+RUN cp Build/ArmVirtQemu-A*64/${build_target}_${toolchain}/FV/QEMU_VARS.fd "${bin_dir}/aarch64/vars.fd"
+RUN cp Build/ArmVirtQemu-A*64/${build_target}_${toolchain}/A*64/Shell.efi "${bin_dir}/aarch64/shell.efi"
 # QEMU requires the AARCH64 files to be exactly 64MiB, so expand with zeroes.
 RUN truncate --size=64MiB "${bin_dir}"/aarch64/code.fd
 RUN truncate --size=64MiB "${bin_dir}"/aarch64/vars.fd
